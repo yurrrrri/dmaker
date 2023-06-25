@@ -1,10 +1,9 @@
 package com.fastcampus.dmaker.controller;
 
-import com.fastcampus.dmaker.dto.CreateDeveloper;
-import com.fastcampus.dmaker.dto.DeveloperDetailDto;
-import com.fastcampus.dmaker.dto.DeveloperDto;
-import com.fastcampus.dmaker.dto.EditDeveloper;
+import com.fastcampus.dmaker.dto.*;
+import com.fastcampus.dmaker.exception.DMakerException;
 import com.fastcampus.dmaker.service.DMakerService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,5 +50,16 @@ public class DMakerController {
     @DeleteMapping("/developer/{memberId}")
     public DeveloperDetailDto deleteDeveloper(@PathVariable String memberId) {
         return dMakerService.deleteDeveloper(memberId);
+    }
+
+    @ExceptionHandler(DMakerException.class)
+    public DMakerErrorResponse handleException(
+            DMakerException e, HttpServletRequest request
+    ) {
+        log.error("errorCode: {}, url: {}, message: {}", e.getDMakerErrorCode(), request.getRequestURL(), e.getDetailMessage());
+        return DMakerErrorResponse.builder()
+                .errorCode(e.getDMakerErrorCode())
+                .message(e.getDetailMessage())
+                .build();
     }
 }
