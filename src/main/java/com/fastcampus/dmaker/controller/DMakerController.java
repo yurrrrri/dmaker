@@ -51,15 +51,4 @@ public class DMakerController {
     public DeveloperDetailDto deleteDeveloper(@PathVariable String memberId) {
         return dMakerService.deleteDeveloper(memberId);
     }
-
-    @ExceptionHandler(DMakerException.class)
-    public DMakerErrorResponse handleException(
-            DMakerException e, HttpServletRequest request
-    ) {
-        log.error("errorCode: {}, url: {}, message: {}", e.getDMakerErrorCode(), request.getRequestURL(), e.getDetailMessage());
-        return DMakerErrorResponse.builder()
-                .errorCode(e.getDMakerErrorCode())
-                .message(e.getDetailMessage())
-                .build();
-    }
 }
