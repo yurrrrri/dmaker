@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.fastcampus.dmaker.code.StatusCode.*;
 import static com.fastcampus.dmaker.constant.DMakerConstant.MAX_JUNIOR_EXPERIENCE_YEARS;
 import static com.fastcampus.dmaker.constant.DMakerConstant.MIN_SENIOR_EXPERIENCE_YEARS;
 import static com.fastcampus.dmaker.dto.CreateDeveloper.*;
@@ -44,7 +45,7 @@ class DMakerServiceTest {
             .developerLevel(SENIOR)
             .developerSkillType(FRONT_END)
             .experienceYears(MIN_SENIOR_EXPERIENCE_YEARS)
-            .statusCode(StatusCode.EMPLOYED)
+            .statusCode(EMPLOYED)
             .name("name")
             .age(30)
             .build();
@@ -61,7 +62,7 @@ class DMakerServiceTest {
     }
 
     @Test
-    void test() {
+    void getDeveloperDetail() {
         given(developerRepository.findByMemberId(anyString()))
                 .willReturn(Optional.of(defaultDeveloper));
         DeveloperDetailDto dto = dMakerService.getDeveloperDetail("memberId");
