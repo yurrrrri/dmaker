@@ -10,7 +10,6 @@ import com.fastcampus.dmaker.entity.RetiredDeveloper;
 import com.fastcampus.dmaker.exception.DMakerException;
 import com.fastcampus.dmaker.repository.DeveloperRepository;
 import com.fastcampus.dmaker.repository.RetiredDeveloperRepository;
-import com.fastcampus.dmaker.type.DeveloperLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.fastcampus.dmaker.exception.DMakerErrorCode.*;
+import static com.fastcampus.dmaker.exception.DMakerErrorCode.DUPLICATED_MEMBER_ID;
+import static com.fastcampus.dmaker.exception.DMakerErrorCode.NO_DEVELOPER;
 
 @RequiredArgsConstructor
 @Service
@@ -48,7 +48,7 @@ public class DMakerService {
     }
 
     private void validateCreateDeveloperRequest(@NonNull CreateDeveloper.Request request) {
-        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(request.getExperienceYears());
 
         developerRepository.findByMemberId(request.getMemberId())
                 .ifPresent(developer -> {
@@ -70,7 +70,7 @@ public class DMakerService {
 
     @Transactional
     public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
-        validateDeveloperLevel(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(request.getExperienceYears());
         return DeveloperDetailDto.fromEntity(
                 getUpdatedDeveloperFromRequest(request, getDeveloperByMemberId(memberId))
         );
@@ -87,20 +87,6 @@ public class DMakerService {
     private Developer getDeveloperByMemberId(String memberId) {
         return developerRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new DMakerException(NO_DEVELOPER));
-    }
-
-    private void validateDeveloperLevel(DeveloperLevel developerLevel, Integer experienceYears) {
-        if (developerLevel == DeveloperLevel.SENIOR
-                && experienceYears < 10) {
-            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-        if (developerLevel == DeveloperLevel.JUNGNIOR
-                && (experienceYears < 4 || experienceYears > 10)) {
-            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears > 4) {
-            throw new DMakerException(LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
     }
 
     @Transactional
