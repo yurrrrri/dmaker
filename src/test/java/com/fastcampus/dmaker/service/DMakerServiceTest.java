@@ -21,6 +21,7 @@ import static com.fastcampus.dmaker.type.DeveloperLevel.SENIOR;
 import static com.fastcampus.dmaker.type.DeveloperSkillType.FRONT_END;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -31,9 +32,6 @@ class DMakerServiceTest {
 
     @Mock
     private DeveloperRepository developerRepository;
-
-    @Mock
-    private RetiredDeveloperRepository retiredDeveloperRepository;
 
     @InjectMocks
     private DMakerService dMakerService;
@@ -57,7 +55,7 @@ class DMakerServiceTest {
             .build();
 
     @Test
-    public void test() {
+    void test() {
         given(developerRepository.findByMemberId(anyString()))
                 .willReturn(Optional.of(defaultDeveloper));
         DeveloperDetailDto dto = dMakerService.getDeveloperDetail("memberId");
@@ -68,14 +66,15 @@ class DMakerServiceTest {
 
     @Test
     void createDeveloper_success() {
-        Request request = defaultCreateRequest;
         given(developerRepository.findByMemberId(anyString()))
                 .willReturn(Optional.empty());
+        given(developerRepository.save(any()))
+                .willReturn(defaultDeveloper);
 
         ArgumentCaptor<Developer> captor =
                 ArgumentCaptor.forClass(Developer.class);
 
-        dMakerService.createDeveloper(request);
+        dMakerService.createDeveloper(defaultCreateRequest);
 
         verify(developerRepository, times(1))
                 .save(captor.capture());
